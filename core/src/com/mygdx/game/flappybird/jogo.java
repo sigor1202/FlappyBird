@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class jogo extends ApplicationAdapter {
 
+	//cria as variaveis e a lista
 	private int movimentaY=0;
 	private  int movimentax =0;
 	SpriteBatch batch;
@@ -45,16 +46,22 @@ public class jogo extends ApplicationAdapter {
 
 		batch.begin();
 
+		//verifica se a variação e se for maior que tres iguala a zero
 		if(variacao > 3)
 			variacao = 0;
 
+		//verificação do clique na tela
 		boolean toquTela = Gdx.input.justTouched();
+
+		//se flor clicado subtrai 25 da gravidade
 		if(Gdx.input.justTouched())
 		{
 			gravidade = -25;
 		}
 
+		//verifica se a posição vertical é maior que zero ou clicou na tela
 		if (posicaoInicialVerticalPassaro > 0 || toquTela)
+			//atualiza a posição vertical
 			posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
 
 		//desenha e configura o onjeto na tela
@@ -63,7 +70,7 @@ public class jogo extends ApplicationAdapter {
 
 		variacao += Gdx.graphics.getDeltaTime() * 10;
 
-		//adiciona +1 na variavel
+		//adiciona +1 nas variaveis
 		gravidade++;
 		movimentax++;
 		movimentaY++;
