@@ -14,12 +14,17 @@ public class jogo extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture[] passaros;
 	Texture fundo;
+	Texture canoBaixo;
+	Texture canoTopo;
 
 	private float larguraDispositivo;
 	private float alturaDispositivo;
 	private float variacao = 0;
 	private float gravidade = 0;
 	private float posicaoInicialVerticalPassaro = 0;
+
+	private float posicaoInicialCano;
+	private float espacamentoCano;
 
 	@Override
 	//classe semelhante ao onCreate
@@ -32,11 +37,17 @@ public class jogo extends ApplicationAdapter {
 		passaros[2] = new Texture("passaro3.png");
 		//pega a imagem fundo e atribui a variavel
 		fundo = new Texture("fundo.png");
+		//pega as texturas dodos canos e atreibui a variavel
+		canoBaixo = new Texture("cano_baixo_maior.png");
+		canoTopo = new Texture("cano_topo_maior.png");
 
 		//pega a altura e largura da tela
 		larguraDispositivo = Gdx.graphics.getWidth();
 		alturaDispositivo = Gdx.graphics.getHeight();
 		posicaoInicialVerticalPassaro = alturaDispositivo/2;
+		//variavel consigura os canos
+		posicaoInicialCano = larguraDispositivo;
+		espacamentoCano = 150;
 
 	}
 
@@ -60,14 +71,24 @@ public class jogo extends ApplicationAdapter {
 		}
 
 		//verifica se a posição vertical é maior que zero ou clicou na tela
-		if (posicaoInicialVerticalPassaro > 0 || toquTela)
+		if (posicaoInicialVerticalPassaro > 0 || toquTela) {
 			//atualiza a posição vertical
 			posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
+		}
 
-		//desenha e configura o onjeto na tela
+		//move os canos
+		if(posicaoInicialCano <-canoTopo.getWidth()){
+			posicaoInicialCano = larguraDispositivo;
+		}
+
+		//desenha e configura o onbeto na tela
 		batch.draw(fundo, 0,0,larguraDispositivo,alturaDispositivo);
 		batch.draw(passaros[(int) variacao],30,posicaoInicialVerticalPassaro);
-
+		batch.draw(canoBaixo,posicaoInicialCano,alturaDispositivo/2 - canoBaixo.getHeight() - espacamentoCano/2 );
+		batch.draw(canoTopo,posicaoInicialCano,alturaDispositivo/2 + espacamentoCano );
+		//atualiza a posição do cano
+		posicaoInicialCano -= Gdx.graphics.getDeltaTime()*200;
+		//atualiza a variação
 		variacao += Gdx.graphics.getDeltaTime() * 10;
 
 		//adiciona +1 nas variaveis
