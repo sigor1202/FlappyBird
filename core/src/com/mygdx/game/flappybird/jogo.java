@@ -28,21 +28,26 @@ public class jogo extends ApplicationAdapter {
 
 
 	private int pontos = 0;
+	private int estadoJogo =0;
 	private float gravidade = 0;
 
-	Texture[] passaros;
-	Texture fundo;
-	Texture canoBaixo;
-	Texture canoTopo;
+	private Texture[] passaros;
+	private Texture fundo;
+	private Texture canoBaixo;
+	private Texture canoTopo;
+	private Texture gameOver;
 	SpriteBatch batch;
-	BitmapFont textoPontuacao;
+
 	private boolean passouCano = false;
 	private Random random;
-
 	private ShapeRenderer shapeRenderer;
 	private Circle circuloPassaro;
 	private Rectangle retanguloCanoCima;
 	private Rectangle retanguloCanoBaixo;
+
+	BitmapFont textoPontuacao;
+	BitmapFont textoReiniciar;
+	BitmapFont textoMelhorPontuacao;
 
 	@Override
 	//classe semelhante ao onCreate
@@ -63,11 +68,19 @@ public class jogo extends ApplicationAdapter {
 		alturaDispositivo = Gdx.graphics.getHeight();
 		posicaoInicialVerticalPassaro = alturaDispositivo/2;
 		posicaoCanoHorizontal = larguraDispositivo;
-		espacoEntreCanos = 350;
+		espacoEntreCanos = 300;
 
 		textoPontuacao = new BitmapFont();
 		textoPontuacao.setColor(Color.WHITE);
 		textoPontuacao.getData().setScale(10);
+
+		textoReiniciar = new BitmapFont();
+		textoReiniciar.setColor(Color.GREEN);
+		textoReiniciar.getData().setScale(3);
+
+		textoMelhorPontuacao = new BitmapFont();
+		textoMelhorPontuacao.setColor(Color.RED);
+		textoMelhorPontuacao.getData().setScale(3);
 
 		shapeRenderer = new ShapeRenderer();
 		circuloPassaro = new Circle();
@@ -88,6 +101,7 @@ public class jogo extends ApplicationAdapter {
 		//pega as texturas dodos canos e atreibui a variavel
 		canoBaixo = new Texture("cano_baixo_maior.png");
 		canoTopo = new Texture("cano_topo_maior.png");
+		gameOver = new Texture("game_over.png");
 	}
 
 	@Override
@@ -111,8 +125,8 @@ public class jogo extends ApplicationAdapter {
 				canoBaixo.getHeight());
 
 		retanguloCanoCima.set(posicaoCanoHorizontal,
-				alturaDispositivo/2-canoBaixo.getHeight()-espacoEntreCanos/2+posicaoCanoVertical,
-				canoBaixo.getWidth(),canoBaixo.getHeight());
+				alturaDispositivo/2 + espacoEntreCanos/2 + posicaoCanoVertical,
+				canoTopo.getWidth(),canoTopo.getHeight());
 			//cria os booleans para verificar a colisão
 			boolean bateuCanoCima = Intersector.overlaps(circuloPassaro,retanguloCanoCima);
 			boolean bateuCanoBaixo = Intersector.overlaps(circuloPassaro,retanguloCanoBaixo);
@@ -120,6 +134,7 @@ public class jogo extends ApplicationAdapter {
 			//verifica se bateu
 			if(bateuCanoBaixo || bateuCanoCima){
 				Gdx.app.log("tag","bateu");
+				estadoJogo=2;
 			}
 
 
@@ -135,40 +150,58 @@ public class jogo extends ApplicationAdapter {
 				passouCano = true;
 			}
 		}
-	}
-
-	private void verificaEstadojogo() {
-		posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime()*200;
-		if (posicaoCanoHorizontal < - canoBaixo.getHeight()){
-			posicaoCanoHorizontal = larguraDispositivo;
-			posicaoCanoVertical = random.nextInt(400)-200;
-			passouCano = false;
-		}
-
-		//verificação do clique na tela
-		boolean toquTela = Gdx.input.justTouched();
-
-		//se flor clicado subtrai 25 da gravidade
-		if(Gdx.input.justTouched())
-		{
-			gravidade = -25;
-		}
-
-		//verifica se a posição vertical é maior que zero ou clicou na tela
-		if (posicaoInicialVerticalPassaro > 0 || toquTela) {
-			//atualiza a posição vertical
-			posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
-		}
 
 		variacao += Gdx.graphics.getDeltaTime() * 10;
 		//verifica se a variação e se for maior que tres iguala a zero
 		if(variacao > 3)
 			variacao = 0;
+	}
 
-		//adiciona +1 nas variaveis
-		gravidade++;
+	private void verificaEstadojogo() {
+
+		//verificação do clique na tela
+		boolean toquTela = Gdx.input.justTouched();
+
+		if(estadoJogo==0){
+
+			//se flor clicado subtrai 25 da gravidade
+			if(toquTela)
+			{
+				gravidade = -15;
+				estadoJogo =1;
+			}
+
+		}else if(estadoJogo ==1){
+
+			//se flor clicado subtrai 25 da gravidade
+			if(toquTela)
+			{
+				gravidade = -15;
+			}
+
+			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime()*200;
+			if (posicaoCanoHorizontal < - canoBaixo.getHeight()){
+				posicaoCanoHorizontal = larguraDispositivo;
+				posicaoCanoVertical = random.nextInt(400)-200;
+				passouCano = false;
+			}
+
+			//verifica se a posição vertical é maior que zero ou clicou na tela
+			if (posicaoInicialVerticalPassaro > 0 || toquTela) {
+				//atualiza a posição vertical
+				posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
+			}
+
+			//adiciona +1 nas variaveis
+			gravidade++;
+
+		}else if(estadoJogo ==2){
+
+		}
+
 
 	}
+
 
 	private void desenharTexturas() {
 		batch.begin();
@@ -179,6 +212,13 @@ public class jogo extends ApplicationAdapter {
 		batch.draw(canoBaixo, posicaoCanoHorizontal, alturaDispositivo/2- canoBaixo.getHeight()-espacoEntreCanos/2+ posicaoCanoVertical);
 		batch.draw(canoTopo, posicaoCanoHorizontal, alturaDispositivo/2 + espacoEntreCanos/2 + posicaoCanoVertical);
 		textoPontuacao.draw(batch, String.valueOf(pontos), larguraDispositivo/2,alturaDispositivo-100);
+
+		if(estadoJogo==2){
+			batch.draw(gameOver,larguraDispositivo/2 - gameOver.getWidth()/2,alturaDispositivo/2);
+			textoReiniciar.draw(batch,"TOQUE NA TELA PARA REINICIAR!",larguraDispositivo/2 - 200,alturaDispositivo/2-gameOver.getHeight()/2);
+			textoMelhorPontuacao.draw(batch,"SUA MELHOR PONTUAÇÃOÉ :0 PONTOS",larguraDispositivo/2 - 300 ,alturaDispositivo/2-gameOver.getHeight()*2);
+		}
+
 
 		batch.end();
 	}
